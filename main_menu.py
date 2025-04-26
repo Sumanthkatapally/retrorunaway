@@ -18,6 +18,7 @@ background = pygame.transform.scale(background, (800, 600))
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Retro Runway - Main Menu")
 
+
 # Fonts
 font = pygame.font.SysFont('Arial', 32)
 small_font = pygame.font.SysFont('Arial', 24)
