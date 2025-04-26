@@ -11,7 +11,8 @@ class Game:
     def __init__(self):
         pygame.init()
         pygame.mixer.init()
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        # self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
         pygame.display.set_caption("Retro Runway")
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 36)
@@ -78,7 +79,7 @@ class Game:
               for enemy in self.level.enemies:
                 enemy.update()
                 if enemy.check_vision(self.player) and not self.player.disco_active:  # Added disco check
-                    self.sound_manager.play_sound("hit")
+                    self.sound_manager.play_sound("hit.mp3")
                     self.game_state = "game_over"
             self.check_level_completion()
             self.camera.update(self.player)
