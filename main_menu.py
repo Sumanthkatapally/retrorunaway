@@ -15,9 +15,10 @@ background = pygame.transform.scale(background, (800, 600))
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Retro Runway - Main Menu")
 
-# Fonts
-font = pygame.font.SysFont('Arial', 32)
-small_font = pygame.font.SysFont('Arial', 24)
+# Load retro font
+retro_font_path = './assets/fonts/PressStart2P-Regular.ttf'  # Make sure this exists
+font = pygame.font.Font(retro_font_path, 20)  # Main button font
+small_font = pygame.font.Font(retro_font_path, 12)  # Instructions font
 
 # Colors
 WHITE = (255, 255, 255)
@@ -41,8 +42,10 @@ class Button:
         mouse_pos = pygame.mouse.get_pos()
         color = HOVER_COLOR if self.rect.collidepoint(mouse_pos) else BUTTON_COLOR
         pygame.draw.rect(surface, color, self.rect)
+
         text_surface = font.render(self.text, True, WHITE)
-        surface.blit(text_surface, (self.rect.x + 20, self.rect.y + 10))
+        text_rect = text_surface.get_rect(center=self.rect.center)
+        surface.blit(text_surface, text_rect)
 
     def check_click(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -93,9 +96,9 @@ def capture_image():
 
 # Buttons
 buttons = [
-    Button('View Instructions', 250, 200, 300, 50, open_instructions),
-    Button('Start by Capturing Image', 250, 300, 300, 50, capture_image),
-    Button('Quit Game', 250, 400, 300, 50, quit_game)
+    Button('INSTRUCTIONS', 250, 200, 300, 50, open_instructions),
+    Button('START CAPTURE', 250, 300, 300, 50, capture_image),
+    Button('QUIT GAME', 250, 400, 300, 50, quit_game)
 ]
 
 # Main loop
@@ -126,14 +129,14 @@ while running:
             "- Hide behind objects if needed.",
             "- Reach the VIP entrance fully dressed!",
             "",
-            "Press 'Close' button to return."
+            "Press 'CLOSE' to return."
         ]
 
         for idx, line in enumerate(instructions):
             text = small_font.render(line, True, WHITE)
             screen.blit(text, (modal_rect.x + 20, modal_rect.y + 20 + idx * 40))
 
-        close_button = Button('Close', modal_rect.x + 200, modal_rect.y + 320, 100, 40, lambda: setattr(sys.modules[__name__], 'show_instructions', False))
+        close_button = Button('CLOSE', modal_rect.x + 220, modal_rect.y + 350, 150, 40, lambda: setattr(sys.modules[__name__], 'show_instructions', False))
         close_button.draw(screen)
 
         for event in pygame.event.get():
