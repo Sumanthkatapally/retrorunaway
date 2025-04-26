@@ -57,7 +57,7 @@ class Game:
                     self.player.add_outfit_piece(collectible.item_type)
                     self.score += 1000
                 collectible.collected = True
-                self.sound_manager.play_sound("collect.mp3")
+                self.sound_manager.play_sound("collect")
 
     def update(self):
         if self.game_state == "playing":
@@ -78,7 +78,7 @@ class Game:
               for enemy in self.level.enemies:
                 enemy.update()
                 if enemy.check_vision(self.player) and not self.player.disco_active:  # Added disco check
-                    self.sound_manager.play_sound("hit.mp3")
+                    self.sound_manager.play_sound("hit")
                     self.game_state = "game_over"
             self.check_level_completion()
             self.camera.update(self.player)

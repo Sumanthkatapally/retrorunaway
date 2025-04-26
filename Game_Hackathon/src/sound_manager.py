@@ -19,9 +19,13 @@ class SoundManager:
         os.makedirs(EFFECTS_PATH, exist_ok=True)
         try:
             for sound_file in os.listdir(EFFECTS_PATH):
-                if sound_file.endswith(('.wav', '.mp3')):
+                if sound_file.endswith(('.wav', '.mp3', '.ogg')):
                     name = os.path.splitext(sound_file)[0]
-                    self.sounds[name] = pygame.mixer.Sound(os.path.join(EFFECTS_PATH, sound_file))
+                    full_path = os.path.join(EFFECTS_PATH, sound_file)
+                    if os.path.exists(full_path):
+                        self.sounds[name] = pygame.mixer.Sound(full_path)
+                    else:
+                        print(f"Sound file not found: {full_path}")
         except Exception as e:
             print(f"Sound loading error: {e}")
 

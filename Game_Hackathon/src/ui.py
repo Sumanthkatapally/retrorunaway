@@ -9,11 +9,11 @@ class UI:
         self.options = ["Start Game", "Controls", "Quit"]
 
     def draw_menu(self, screen):
-        screen.fill(BLACK)
+        #screen.fill(BLACK)
         
         # Title
-        title = self.font_large.render("RETRO RUNWAY", True, NEON_PINK)
-        screen.blit(title, (SCREEN_WIDTH//2 - title.get_width()//2, 100))
+        # title = self.font_large.render("RETRO RUNWAY", True, NEON_PINK)
+        # screen.blit(title, (SCREEN_WIDTH//2 - title.get_width()//2, 100))
         
         # Options
         for i, option in enumerate(self.options):
