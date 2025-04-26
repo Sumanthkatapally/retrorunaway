@@ -31,6 +31,11 @@ BUTTON_COLOR = (50, 50, 200)
 HOVER_COLOR = (70, 70, 250)
 MODAL_COLOR = (0, 0, 0, 200)  # Semi-transparent black
 CIRCLE_COLOR = (40, 40, 40)
+PURPLE = (142, 45, 226)  # #8e2de2
+BLUE = (74, 0, 224)      # #4a00e0
+PURPLE_MODAL = (142, 45, 226, 240)  # Rich purple, slightly transparent
+DARK_PURPLE_TOP = (75, 0, 110)
+DARK_PURPLE_BOTTOM = (26, 0, 51)
 
 # Variables
 show_instructions = False
@@ -41,10 +46,6 @@ camera_buttons = []
 close_button = None  # Initialize close_button variable
 show_live_feed = True  # Add this with other global variables
 
-# Gradient colors for main menu buttons
-PURPLE = (142, 45, 226)  # #8e2de2
-BLUE = (74, 0, 224)      # #4a00e0
-
 # Button Class
 class Button:
     def __init__(self, text, x, y, w, h, callback, font=button_font):
@@ -53,11 +54,12 @@ class Button:
         self.callback = callback
         self.font = font
 
-    def draw(self, surface, gradient=False):
+    def draw(self, surface, gradient=False, color_override=None):
         mouse_pos = pygame.mouse.get_pos()
         color = HOVER_COLOR if self.rect.collidepoint(mouse_pos) else BUTTON_COLOR
-        if gradient:
-            # Draw gradient background
+        if color_override is not None:
+            pygame.draw.rect(surface, color_override, self.rect, border_radius=10)
+        elif gradient:
             draw_gradient_rect(surface, self.rect, PURPLE, BLUE)
         else:
             pygame.draw.rect(surface, color, self.rect, border_radius=10)
@@ -94,21 +96,11 @@ def quit_game():
 
 def create_camera_buttons():
     global camera_buttons
-    if not image_captured:
-        camera_buttons = [
-            Button('Capture', 200, 500, 120, 40, capture_current_frame),
-            Button('Continue Without', 340, 500, 200, 40, continue_without_capture)
-        ]
-    else:
-        camera_buttons = [
-            Button('Click', 200, 500, 120, 40, take_snapshot),
-            Button('Done', 340, 500, 120, 40, finish_capture)
-        ]
-
-def capture_current_frame():
-    global image_captured
-    image_captured = True
-    create_camera_buttons()  # Update buttons to show Click and Done
+    # Initial state: Click and Exit
+    camera_buttons = [
+        Button('Click', 200, 500, 120, 40, take_snapshot),
+        Button('Exit', 340, 500, 120, 40, finish_capture)
+    ]
 
 def take_snapshot():
     global captured_image, image_captured, camera_buttons, show_live_feed
@@ -116,8 +108,9 @@ def take_snapshot():
         ret, frame = cap.read()
         if ret:
             captured_image = frame
+            image_captured = True  # Mark that an image has been captured
             show_live_feed = False  # Don't show live feed after capture
-            # Update buttons to show Recapture and Done
+            # After Click: Recapture and Done
             camera_buttons = [
                 Button('Recapture', 200, 500, 120, 40, recapture_image),
                 Button('Done', 340, 500, 120, 40, finish_capture)
@@ -126,10 +119,10 @@ def take_snapshot():
 def recapture_image():
     global image_captured, camera_buttons, show_live_feed
     show_live_feed = True  # Show live feed when recapturing
-    # Update buttons back to Click and Done
+    # Return to Click and Exit
     camera_buttons = [
         Button('Click', 200, 500, 120, 40, take_snapshot),
-        Button('Done', 340, 500, 120, 40, finish_capture)
+        Button('Exit', 340, 500, 120, 40, finish_capture)
     ]
 
 def finish_capture():
@@ -160,6 +153,15 @@ def draw_gradient_rect(surface, rect, color1, color2):
         g = int(color1[1] * (1 - ratio) + color2[1] * ratio)
         b = int(color1[2] * (1 - ratio) + color2[2] * ratio)
         pygame.draw.line(surface, (r, g, b), (x, y + i), (x + w, y + i))
+
+def draw_gradient_circle(surface, center, radius, color1, color2, width=10):
+    """Draw a circular gradient border from color1 to color2."""
+    for i in range(width):
+        ratio = i / width
+        r = int(color1[0] * (1 - ratio) + color2[0] * ratio)
+        g = int(color1[1] * (1 - ratio) + color2[1] * ratio)
+        b = int(color1[2] * (1 - ratio) + color2[2] * ratio)
+        pygame.draw.circle(surface, (r, g, b), center, radius - i, 1)
 
 # Buttons
 # Place menu in the top right corner
@@ -215,8 +217,16 @@ while running:
         screen.blit(overlay, (0, 0))
 
         modal_rect = pygame.Rect(150, 100, 500, 400)
-        pygame.draw.rect(screen, BLACK, modal_rect, border_radius=10)
-        pygame.draw.rect(screen, WHITE, modal_rect, 2, border_radius=10)
+        # Draw dark purple gradient modal background
+        modal_surface = pygame.Surface((500, 400), pygame.SRCALPHA)
+        for i in range(400):
+            ratio = i / 400
+            r = int(DARK_PURPLE_TOP[0] * (1 - ratio) + DARK_PURPLE_BOTTOM[0] * ratio)
+            g = int(DARK_PURPLE_TOP[1] * (1 - ratio) + DARK_PURPLE_BOTTOM[1] * ratio)
+            b = int(DARK_PURPLE_TOP[2] * (1 - ratio) + DARK_PURPLE_BOTTOM[2] * ratio)
+            pygame.draw.line(modal_surface, (r, g, b, 230), (0, i), (500, i))
+        pygame.draw.rect(modal_surface, WHITE, modal_surface.get_rect(), 2, border_radius=10)
+        screen.blit(modal_surface, (150, 100))
 
         instructions = [
             "Instructions:",
@@ -248,32 +258,48 @@ while running:
             frame = pygame.surfarray.make_surface(frame)
             frame = pygame.transform.scale(frame, (400, 300))
 
-            # Create circular mask
+            # Create a transparent surface for the circular camera feed
+            cam_surface = pygame.Surface((400, 300), pygame.SRCALPHA)
+            cam_surface.fill((0, 0, 0, 0))  # Fully transparent
+
+            # Create a circular mask
             mask = pygame.Surface((400, 300), pygame.SRCALPHA)
+            mask.fill((0, 0, 0, 0))
             pygame.draw.circle(mask, (255, 255, 255, 255), (200, 150), 150)
-            
-            # Apply mask to frame
-            frame.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-            
-            # Draw circular background
-            pygame.draw.circle(screen, CIRCLE_COLOR, (400, 300), 160)
-            
-            # If we have a captured image and not showing live feed, show the captured image
+
+            # Decide what to show: captured image or live feed
             if not show_live_feed and captured_image is not None:
-                # Convert captured image to Pygame surface
+                # Show the captured image
                 preview = cv2.cvtColor(captured_image, cv2.COLOR_BGR2RGB)
                 preview = np.rot90(preview)
                 preview = pygame.surfarray.make_surface(preview)
                 preview = pygame.transform.scale(preview, (400, 300))
-                preview.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-                screen.blit(preview, (200, 150))
+                preview.set_colorkey((0, 0, 0))
+                cam_surface.blit(preview, (0, 0))
+                cam_surface.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
             else:
-                # Show live feed
-                screen.blit(frame, (200, 150))
+                # Show the live feed
+                frame.set_colorkey((0, 0, 0))
+                cam_surface.blit(frame, (0, 0))
+                cam_surface.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
-            # Draw camera buttons
+            # Draw gradient border (no black rectangle)
+            circle_center = (400, 300)
+            draw_gradient_circle(screen, circle_center, 160, PURPLE, BLUE, width=16)
+
+            # Blit the circular camera feed (transparent outside the circle)
+            screen.blit(cam_surface, (200, 150))
+
+            # Center the camera buttons below the circle
+            total_button_width = sum([button.rect.width for button in camera_buttons]) + 40 * (len(camera_buttons) - 1)
+            start_x = 400 - total_button_width // 2
+            button_y = 480
+            x = start_x
             for button in camera_buttons:
-                button.draw(screen)
+                button.rect.x = x
+                button.rect.y = button_y
+                button.draw(screen, color_override=BLACK)
+                x += button.rect.width + 40
 
     pygame.display.flip()
 
