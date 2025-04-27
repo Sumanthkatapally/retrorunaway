@@ -1,5 +1,3 @@
-# File: src/game.py
-
 import pygame
 import sys
 import os
@@ -27,13 +25,28 @@ class Game:
         self.game_state = "playing"
         # Play level music (strip .mp3)
         self.sound_manager.play_music(self.level.music.replace('.mp3',''))
+
+        # Load background image
         try:
-            self.bg_image = pygame.image.load(os.path.join(ASSETS_DIR, "Images", "background.png")).convert()
+            self.bg_image = pygame.image.load(
+                os.path.join(ASSETS_DIR, "Images", "background.png")
+            ).convert()
             self.bg_rect = self.bg_image.get_rect()
         except FileNotFoundError:
-            print("Background image not found!")
             self.bg_image = None
             self.bg_rect = None
+
+        # Load win and lose screens
+        self.win_image = pygame.image.load(
+            os.path.join(ASSETS_DIR, "Images", "win_screen.png")
+        ).convert()
+        self.win_image = pygame.transform.scale(self.win_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+        self.lose_image = pygame.image.load(
+            os.path.join(ASSETS_DIR, "Images", "lost_screen.png")
+        ).convert()
+        self.lose_image = pygame.transform.scale(self.lose_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
         # Delay bouncer activation
         self.collision_delay = pygame.time.get_ticks() + 2000
 
@@ -78,22 +91,15 @@ class Game:
             self.player.update(self.level.platforms)
             self.player.rect.x = max(0, min(self.player.rect.x, SCREEN_WIDTH * 2 - self.player.rect.width))
 
+            # Enemy collisions
             if pygame.time.get_ticks() > self.collision_delay:
                 for enemy in self.level.enemies:
                     enemy.update()
-
-                    # Check if player is hiding (crouching inside any hiding spot)
                     hiding = (
                         self.player.crouching
                         and pygame.sprite.spritecollideany(self.player, self.level.hiding_spots)
                     )
-
-                    # Only catch if in vision, not disco, and not hiding
-                    if (
-                        enemy.check_vision(self.player)
-                        and not self.player.disco_active
-                        and not hiding
-                    ):
+                    if enemy.check_vision(self.player) and not self.player.disco_active and not hiding:
                         self.sound_manager.play_sound("hit")
                         self.game_state = "game_over"
 
@@ -120,6 +126,17 @@ class Game:
                 self.sound_manager.play_music("victory_theme")
 
     def draw(self):
+        # If game over or victory, show full screen
+        if self.game_state == "game_over":
+            self.screen.blit(self.lose_image, (0, 0))
+            pygame.display.flip()
+            return
+        if self.game_state == "victory":
+            self.screen.blit(self.win_image, (0, 0))
+            pygame.display.flip()
+            return
+
+        # Otherwise draw the normal level
         if self.bg_image:
             for x in range(0, SCREEN_WIDTH, self.bg_rect.width):
                 for y in range(0, SCREEN_HEIGHT, self.bg_rect.height):
@@ -142,11 +159,6 @@ class Game:
         self.player.draw(self.screen, self.camera)
         self.draw_hud()
 
-        if self.game_state == "game_over":
-            self.draw_game_over()
-        elif self.game_state == "victory":
-            self.draw_victory()
-
         pygame.display.flip()
 
     def draw_hud(self):
@@ -164,25 +176,6 @@ class Game:
                                (SCREEN_WIDTH - 30 - i*40, 30),
                                15)
 
-    def draw_game_over(self):
-        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-        overlay.fill((0,0,0,200))
-        self.screen.blit(overlay, (0,0))
-        text = self.font.render("GAME OVER! Press R to Restart", True, NEON_PINK)
-        self.screen.blit(text, (SCREEN_WIDTH//2 - text.get_width()//2,
-                                SCREEN_HEIGHT//2))
-
-    def draw_victory(self):
-        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-        overlay.fill((0,0,0,200))
-        self.screen.blit(overlay, (0,0))
-        text = self.font.render("GROOVY! YOU'RE DISCO ROYALTY!", True, RETRO_YELLOW)
-        self.screen.blit(text, (SCREEN_WIDTH//2 - text.get_width()//2,
-                                SCREEN_HEIGHT//2 - 50))
-        score_text = self.font.render(f"Final Score: {self.score}", True, NEON_PINK)
-        self.screen.blit(score_text, (SCREEN_WIDTH//2 - score_text.get_width()//2,
-                                      SCREEN_HEIGHT//2 + 20))
-
 class Camera:
     def __init__(self):
         self.offset = pygame.math.Vector2(0, 0)
@@ -193,6 +186,7 @@ class Camera:
 
     def set_level_width(self, level_width):
         self.level_width = level_width
+
 
 def main():
     game = Game()
