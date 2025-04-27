@@ -30,13 +30,16 @@ LEVELS = [
       'bg_color': (20,20,40),
       'music': 'level1_theme.mp3',
       'enemies': 3,
-      'collectibles': ['Bell-Bottom','Disco-Shirt']
+      'collectibles': ['Bell-Bottom','Disco-Shirt'],
+      # parking lot uses cars by name
     },
     {
       'name': 'Neon Nightclub',
       'bg_color': (10,10,30),
       'music': 'level2_theme.mp3',
       'enemies': 5,
-      'collectibles': ['Sunglasses','Shoe','hair']
+      'collectibles': ['Sunglasses','Shoe','hair'],
+      # explicitly request cars here as well
+      'hiding_spots': 'cars'
     }
 ]
