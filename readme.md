@@ -1,90 +1,120 @@
-# Retro Runway - Main Menu
+# 🎮 Retro Runaway - Stealth Adventure Game
 
-A simple Python-based main menu screen for the Retro Runway game.
+[![Python](https://img.shields.io/badge/Python-3.7+-blue?logo=python)](https://www.python.org/)
+[![Pygame](https://img.shields.io/badge/Pygame-2.0+-green?logo=pygame)](https://www.pygame.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Features
+> 🌉 Sneak past bouncers, collect retro items, and blend into the disco crowd in this vibrant stealth game built in Python with Pygame!
 
-- **View Instructions**: Opens a modal window displaying game controls and objectives.
-- **Start by Capturing Image**: Launches the webcam to capture a player image with options to capture, recapture, or continue without saving.
-- **Quit Game**: Exits the application cleanly.
-- **Background**: Uses a retro neon cityscape as the menu background.
-- **State Tracking**: Maintains a boolean flag to indicate whether an image has been captured.
+---
 
-## Prerequisites
+## 🚀 Features
+
+- 🕶️ **Stealth Mechanics:** Hide behind objects and dodge patrolling bouncers.
+- 🚵️ **Collectibles:** Gather retro clothing and items to upgrade your look.
+- 🎵 **Dynamic Sounds:** Engaging retro-style sound effects and background music.
+- 🌉 **Retro Pixel Art:** Neon-lit cityscape with vibrant visual style.
+- 🎯 **Camera and Hiding Spots:** Utilize obstacles for strategic gameplay.
+- 🎮 **Menu System:** Interactive game start, instructions, and webcam capture options.
+
+---
+
+## 📂 Project Structure
+
+```
+gamehackathon/
+└── src/
+    ├── assets/            # Images, sprites, audio assets
+    ├── bouncer.py         # Bouncer (enemy) AI
+    ├── collectible.py     # Collectible item logic
+    ├── constants.py       # Global constants for the game
+    ├── game.py            # Core game loop and logic
+    ├── hiding_spot.py     # Hiding spot logic
+    ├── level.py           # Level design and layout
+    ├── main.py            # Main entry point
+    ├── player.py          # Player character logic
+    ├── sound_manager.py   # Manages sounds and music
+    └── ui.py              # UI rendering and interaction
+```
+
+---
+
+## 📦 Requirements
 
 - Python 3.7 or higher
-- `pygame` for the game UI
-- `opencv-python` (cv2) for camera capture
+- `pygame`
+- `opencv-python`
 
-## Installation
+Install all dependencies:
 
-1. **Clone the repository** (or copy project files) into your local machine:
+```bash
+pip install -r requirements.txt
+```
+
+Or manually install:
+
+```bash
+pip install pygame opencv-python
+```
+
+---
+
+## 🛠️ Installation & Running
+
+1. **Clone the repository:**
    ```bash
-   git clone <your-repo-url>
-   cd <project-folder>
+   git clone https://github.com/Sumanthkatapally/retrorunaway.git
+   cd retrorunaway/gamehackathon/src
    ```
 
-2. **(Optional but recommended) Create a virtual environment**:
+2. **(Recommended) Create a virtual environment:**
    ```bash
    python -m venv venv
    # Windows
    venv\Scripts\activate
-   # macOS / Linux
+   # Mac/Linux
    source venv/bin/activate
    ```
 
-3. **Install dependencies**:
+3. **Install dependencies:**
    ```bash
-   pip install -r requirements.txt
-   ```
-   If you don’t have a `requirements.txt`, install manually:
-   ```bash
-   pip install pygame opencv-python
+   pip install -r ../../requirements.txt
    ```
 
-## File Structure
-
-```
-RetroRunwayMainMenu/
-├── main_menu.py        # Main Python script for menu screen
-├── bf87e121-7ad3-4c4c-b715-56ba187beb33.png   # Background image
-├── captured_image.png  # (Generated) Last captured image
-├── requirements.txt    # Project dependencies
-└── README.md           # Project overview and setup instructions
-```
-
-## Usage
-
-1. **Run the main script**:
+4. **Run the game:**
    ```bash
-   python main_menu.py
+   python main.py
    ```
-2. **Interact with the menu**:
-   - Click **View Instructions** to read game controls.
-   - Click **Start by Capturing Image** to open your webcam:
-     - Press `c` to capture an image.
-     - Press `d` to save and finish.
-     - Press `r` to discard and recapture.
-     - Press `q` to exit without saving.
-   - Click **Quit Game** to close the application.
 
-3. **Captured images** will be saved as `captured_image.png` in the project folder.
+---
 
-## Troubleshooting
+## 🎮 Gameplay Controls
 
-- **`ModuleNotFoundError: No module named 'pygame'`**: Ensure you installed `pygame` in the same environment you’re running the script in (see Installation steps).
-- **No webcam detected**: Confirm your camera is connected and not in use by other apps.
+| Action                  | Key                |
+|--------------------------|--------------------|
+| Move Left                | A or Left Arrow     |
+| Move Right               | D or Right Arrow    |
+| Move Up                  | W or Up Arrow       |
+| Move Down                | S or Down Arrow     |
 
-## Contributing
+---
 
-Contributions, issues, and feature requests are welcome! Feel free to open a pull request or issue in the repository.
+## 📋 TODO & Future Improvements
 
-## License
+- Add more levels and challenges 🌆
+- Enhance bouncer AI behavior 🧠
+- Power-ups and speed boosts 🏃
+- Multiplayer local co-op mode 👩‍👩‍👧
 
-This project is released under the MIT License. See [LICENSE](LICENSE) for details.
+---
 
-## Acknowledgements
+## 📄 License
 
-- Inspired by 80s/90s synthwave and pixel-art aesthetics.
-- Built with [pygame](https://www.pygame.org/) and [OpenCV](https://opencv.org/).
+This project is licensed under the [MIT License](LICENSE).
 
+---
+
+## 🎨 Acknowledgements
+
+- Inspired by **80s Disco Era** and **Retro Pixel Art**
+- Built with ❤️ using [Pygame](https://www.pygame.org/) and [OpenCV](https://opencv.org/)
